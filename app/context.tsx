@@ -1,5 +1,5 @@
 "use client"
-import { createContext, useCallback, useContext, useReducer } from "react";
+import { createContext, useCallback, useContext, useMemo, useReducer } from "react";
 import clone from "just-clone";
 import type z from "zod";
 
@@ -47,11 +47,11 @@ function createMultiStepFormContext<T>(schemas: z.AnyZodObject) {
   }
 
   function FormProvider({ children } : {children: React.ReactNode}) {
-    console.log(init(schemas));
-    const [state, dispatch] = useReducer(formReducer,{currentStep: 0,data: init(schemas) as T});
+    const initialData = useMemo(() => init(schemas) as T, []);
+    const [state, dispatch] = useReducer(formReducer,{currentStep: 0,data: initialData});
 
     const nextStep = useCallback(() => {
-      dispatch({ type: "NEXT_STEP" });
+      dispatch({ type: "NEXT_STEP" });  
     }, []);
 
     const previousStep = useCallback(() => {
