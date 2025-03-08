@@ -18,7 +18,7 @@ type FormContextType<T> = {
 };
 
 
-function createMultiStepFormContext<T>(schemas: z.AnyZodObject) {
+function createMultiStepFormContext<T>(payloadSchema: z.AnyZodObject) {
   const FormContext = createContext<FormContextType<T> | undefined>(undefined);
 
   function formReducer(
@@ -47,7 +47,7 @@ function createMultiStepFormContext<T>(schemas: z.AnyZodObject) {
   }
 
   function FormProvider({ children } : {children: React.ReactNode}) {
-    const initialData = useMemo(() => init(schemas) as T, []);
+    const initialData = useMemo(() => init(payloadSchema) as T, []);
     const [state, dispatch] = useReducer(formReducer,{currentStep: 0,data: initialData});
 
     const nextStep = useCallback(() => {
@@ -84,8 +84,8 @@ function createMultiStepFormContext<T>(schemas: z.AnyZodObject) {
 
 
 
-export function withMultiStepForm<T>(schemas: z.AnyZodObject){
-    return createMultiStepFormContext<T>(schemas);
+export function withMultiStepForm<T>(payloadSchema: z.AnyZodObject){
+    return createMultiStepFormContext<T>(payloadSchema);
 }
 
 
