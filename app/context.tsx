@@ -3,7 +3,7 @@ import { createContext, useCallback, useContext, useReducer } from "react";
 import clone from "just-clone";
 import type z from "zod";
 
-type FormAction<T> = { type: "NEXT_STEP" } | { type: "PREVIOUS_STEP" } | {type: "MUTATE_DATA"};
+type FormAction<T> = { type: "NEXT_STEP" } | { type: "PREVIOUS_STEP" } | {type: "MUTATE_DATA", payload: Partial<T>};
 
 type FormState<T> = {
   currentStep: number;
@@ -14,7 +14,7 @@ type FormContextType<T> = {
   state: FormState<T>;
   nextStep: () => void;
   previousStep: () => void;
-  mutateData: () => void;
+  mutateData: (data: Partial<T>) => void;
 };
 
 
@@ -36,6 +36,11 @@ function createMultiStepFormContext<T>(schemas: z.AnyZodObject) {
           ...state,
           currentStep: state.currentStep - 1,
         };
+      case "MUTATE_DATA":
+        return {
+          ...state,
+          data: {...state.data, ...action.payload}
+        }
       default:
         return state;
     }
@@ -53,8 +58,8 @@ function createMultiStepFormContext<T>(schemas: z.AnyZodObject) {
         dispatch({ type: "PREVIOUS_STEP" });
       }, []);
 
-    const mutateData = useCallback(() => {
-      dispatch({type: "MUTATE_DATA"});
+    const mutateData = useCallback((data: Partial<T>) => {
+      dispatch({type: "MUTATE_DATA", payload: data});
     },[]);
     const value : FormContextType<T> = {
         state,
